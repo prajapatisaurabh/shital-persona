@@ -1,4 +1,5 @@
 "use client";
+import { getOpenAIChatResponse } from "@/utils/api";
 import { useEffect, useRef, useState } from "react";
 
 // Types
@@ -9,9 +10,6 @@ interface Message {
   time: string;
 }
 
-// Simple Chat Theme — React + Tailwind + TypeScript
-// One user chats, and AI responds. Full-page card layout.
-
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, sender: "user", text: "Hello!", time: "10:00 AM" },
@@ -19,7 +17,7 @@ export default function Chat() {
       id: 2,
       sender: "ai",
       text: "Hi there, how can I help you today?",
-      time: "10:00 AM",
+      time: Date.now().toString(),
     },
   ]);
 
@@ -32,7 +30,7 @@ export default function Chat() {
     }
   }, [messages]);
 
-  function sendMessage() {
+  async function sendMessage() {
     if (!text.trim()) return;
     const now = new Date();
     const time = now.toLocaleTimeString([], {
@@ -49,16 +47,28 @@ export default function Chat() {
     setMessages((m) => [...m, newMessage]);
     setText("");
 
-    // Fake AI response after short delay
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: Date.now() + 1,
-        sender: "ai",
-        text: 'This is an AI response to: "' + newMessage.text + '"',
-        time,
-      };
-      setMessages((m) => [...m, aiResponse]);
-    }, 800);
+    const tempId = Date.now() + 1;
+    const placeholder: Message = {
+      id: tempId,
+      sender: "ai",
+      text: "...",
+      time,
+    };
+    setMessages((prev) => [...prev, placeholder]);
+
+    try {
+      const data = await getOpenAIChatResponse(text);
+
+      setMessages((prev) =>
+        prev.map((m) => (m.id === tempId ? { ...m, text: data } : m))
+      );
+    } catch {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === tempId ? { ...m, text: "⚠️ Failed to fetch AI response" } : m
+        )
+      );
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -75,10 +85,10 @@ export default function Chat() {
         <div className="px-6 py-4 bg-gradient-to-r from-indigo-600 to-pink-500 text-white flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-semibold">
-              SP
+              SS
             </div>
             <div>
-              <div className="text-lg font-semibold">ThitaChat</div>
+              <div className="text-lg font-semibold">Shital</div>
               <div className="text-sm opacity-90">Chat with AI</div>
             </div>
           </div>
@@ -104,7 +114,7 @@ export default function Chat() {
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
-                className="flex-1 resize-none rounded-xl border px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 h-14"
+                className="flex-1 resize-none rounded-xl border text-gray-800 px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 h-14"
               />
               <button
                 onClick={sendMessage}
@@ -135,8 +145,8 @@ function MessageBubble({ message }: MessageBubbleProps) {
     >
       {isUser && (
         <div className="mr-3 flex-shrink-0">
-          <div className="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold">
-            U
+          <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold">
+            S
           </div>
         </div>
       )}
@@ -152,7 +162,9 @@ function MessageBubble({ message }: MessageBubbleProps) {
           {message.text}
         </div>
         <div
-          className={`mt-1 text-[11px] ${isUser ? "text-left" : "text-right"}`}
+          className={`mt-1 text-[11px] text-gray-800 ${
+            isUser ? "text-left" : "text-right"
+          }`}
         >
           {message.time}
         </div>
