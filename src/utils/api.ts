@@ -37,10 +37,7 @@ export async function getOpenAIChatResponse(prompt: string): Promise<string> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${
-          process.env.OPENAI_API_KEY ??
-          "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"
-        }`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
