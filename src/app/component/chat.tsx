@@ -1,11 +1,10 @@
 "use client";
 import { getOpenAIChatResponse } from "@/utils/api";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { MessageBubble } from "./MessageBubble";
 
 // Types
-interface Message {
+export interface Message {
   id: number;
   sender: "user" | "ai";
   text: string;
@@ -14,12 +13,15 @@ interface Message {
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
-    { id: 1, sender: "user", text: "Hello!", time: "10:00 AM" },
     {
-      id: 2,
+      id: 1,
       sender: "ai",
-      text: "Hi there, how can I help you today?",
-      time: Date.now().toString(),
+      text: `I am Dr. Shital, and I can only provide guidance on medical and health-related topics. How can I assist you with your health concerns today?
+– Dr. Shital, UN Mehta Hospital`,
+      time: new Intl.DateTimeFormat(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date()),
     },
   ]);
 
@@ -131,58 +133,6 @@ export default function Chat() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-interface MessageBubbleProps {
-  message: Message;
-}
-
-function MessageBubble({ message }: MessageBubbleProps) {
-  const isUser = message.sender === "user";
-  return (
-    <div
-      className={`flex items-end ${isUser ? "justify-start" : "justify-end"}`}
-    >
-      {isUser && (
-        <div className="mr-3 flex-shrink-0">
-          <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold">
-            S
-          </div>
-        </div>
-      )}
-
-      <div className={`max-w-[72%]`}>
-        <div
-          className={`px-4 py-2 rounded-2xl leading-relaxed text-sm ${
-            isUser
-              ? "rounded-br-none bg-indigo-50 text-gray-800 border border-indigo-100"
-              : "rounded-bl-none bg-pink-50 text-gray-800 border border-pink-100"
-          }`}
-        >
-          {
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {message.text}
-            </ReactMarkdown>
-          }
-        </div>
-        <div
-          className={`mt-1 text-[11px] text-gray-800 ${
-            isUser ? "text-left" : "text-right"
-          }`}
-        >
-          {message.time}
-        </div>
-      </div>
-
-      {!isUser && (
-        <div className="ml-3 flex-shrink-0">
-          <div className="w-9 h-9 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center font-semibold">
-            AI
-          </div>
-        </div>
-      )}
     </div>
   );
 }
