@@ -1,6 +1,8 @@
 "use client";
 import { getOpenAIChatResponse } from "@/utils/api";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // Types
 interface Message {
@@ -159,7 +161,11 @@ function MessageBubble({ message }: MessageBubbleProps) {
               : "rounded-bl-none bg-pink-50 text-gray-800 border border-pink-100"
           }`}
         >
-          {message.text}
+          {
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.text}
+            </ReactMarkdown>
+          }
         </div>
         <div
           className={`mt-1 text-[11px] text-gray-800 ${
