@@ -18,10 +18,7 @@ export default function Chat() {
       sender: "ai",
       text: `I am Dr. Shital, and I can only provide guidance on medical and health-related topics. How can I assist you with your health concerns today?
 – Dr. Shital, UN Mehta Hospital`,
-      time: new Intl.DateTimeFormat(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(new Date()),
+      time: new Date().toString(),
     },
   ]);
 
